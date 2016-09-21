@@ -7,9 +7,6 @@
   'use strict';
 
   var gm = new GameManager();
-
-
-  gm.startGame();
-
+  gm.init();
 
 }(jQuery);

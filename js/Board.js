@@ -10,6 +10,8 @@ var Board = (function($) {
         this.dimension = 3;
         this.placeholder = placeholder;
         this.cells = [];
+
+        this.buildGrid();
     }
 
     Board.prototype.buildGrid = function(test, testGrid) {
@@ -77,56 +79,36 @@ var Board = (function($) {
 
     Board.prototype.checkWinner = function(lastMove) {
         var cellSymbol = this.cells[lastMove[0]][lastMove[1]].symbol;
-        if (this.checkRow(lastMove, cellSymbol)) {
-            // Check the row
-            console.log("check row");
+        if (this.checkSection(lastMove, cellSymbol, "row") ||
+            this.checkSection(lastMove, cellSymbol, "col") ||
+            (lastMove[0] == lastMove[1] && this.checkSection(lastMove, cellSymbol, "mainDiag")) ||
+            (lastMove[0] + lastMove[1] === this.dimension - 1 && this.checkSection(lastMove, cellSymbol, "secondDiag"))) {
             return cellSymbol;
-        } else if (this.checkCol(lastMove, cellSymbol)) {
-            // Check the column
-            console.log("check col");
-            return cellSymbol;
-        } else if (lastMove[0] === lastMove[1] && this.checkFirstDiag(lastMove, cellSymbol)) {
-            // Check 1st diagonal
-            console.log("check 1st diagonal");
-            return cellSymbol;
-        } else if (lastMove[0] + lastMove[1] === this.dimension - 1 && this.checkSecondDiag(lastMove, cellSymbol)) {
-            // Check 2nd diagonal
-            console.log("check 2nd diagonal");
-            return cellSymbol;
-        } else {
-            return false;
         }
+        return false;
     };
 
-    Board.prototype.checkRow = function(lastMove, cellSymbol) {
-        for (var col = 0; col < this.dimension; col++) {
-            if (this.cells[lastMove[0]][col].isEmpty() || this.cells[lastMove[0]][col].symbol !== cellSymbol) {
-                return false;
+    Board.prototype.checkSection = function(lastMove, cellSymbol, toCheck) {
+        var row, col;
+        for (var i = 0; i < this.dimension; i++) {
+            switch (toCheck) {
+                case "row":
+                    row = lastMove[0];
+                    col = i;
+                    break;
+                case "col":
+                    row = i;
+                    col = lastMove[1];
+                    break;
+                case "mainDiag":
+                    row = i;
+                    col = i;
+                    break;
+                case "secondDiag":
+                    row = i;
+                    col = this.dimension - row - 1;
+                    break;
             }
-        }
-        return true;
-    };
-
-    Board.prototype.checkCol = function(lastMove, cellSymbol) {
-        for (var row = 0; row < this.dimension; row++) {
-            if (this.cells[row][lastMove[1]].isEmpty() || this.cells[row][lastMove[1]].symbol !== cellSymbol) {
-                return false;
-            }
-        }
-        return true;
-    };
-
-    Board.prototype.checkFirstDiag = function(lastMove, cellSymbol) {
-        for (var pos = 0; pos < this.dimension; pos++) {
-            if (this.cells[pos][pos].isEmpty() || this.cells[pos][pos].symbol !== cellSymbol) {
-                return false;
-            }
-        }
-        return true;
-    };
-
-    Board.prototype.checkSecondDiag = function(lastMove, cellSymbol) {
-        for (var row = 0, col = this.dimension - row - 1; row < this.dimension; row++, col = this.dimension - row - 1) {
             if (this.cells[row][col].isEmpty() || this.cells[row][col].symbol !== cellSymbol) {
                 return false;
             }
