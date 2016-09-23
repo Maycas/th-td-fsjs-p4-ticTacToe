@@ -7,10 +7,10 @@ var GameManager = (function($) {
     'use strict';
 
     function GameManager() {
-        this.player1;
-        this.player2;
-        this.currentPlayer;
-        this.board;
+        this.player1 = undefined;
+        this.player2 = undefined;
+        this.currentPlayer = undefined;
+        this.board = undefined;
 
         this.startScreen = '<div class="screen screen-start" id="start"> <header> <h1>Tic Tac Toe</h1> <form> <div id="mode-select"> <a href="#" class="button player-select" id="single-player">Single player</a> <a href="#" class="button player-select" id="multiplayer">Multiplayer</a> </div> <div id="player-1"> <label for="player-input-1">Player 1</label> <input type="text" id="player-input-1" placeholder="Enter player name"> </div> <div id="player-2"> <label for="player-input-2">Player 2</label> <input type="text" id="player-input-2" placeholder="Enter player name"> </div> </form> <a href="#" class="button" id="start-game">Start game</a> <a href="#" id="back">&lt;&lt; Back to Mode select</a> </header> </div>';
 
@@ -86,7 +86,7 @@ var GameManager = (function($) {
 
         // Create the players for the game
         gameManager.player1 = new Player("O", playerOneName, false);
-        gameManager.player2 = new Player("X", playerTwoName, playerTwoIsComputer);
+        gameManager.player2 = new Player("X", playerTwoName, playerTwoIsComputer, "easy");
     };
 
     GameManager.prototype.loadGameScreen = function() {
