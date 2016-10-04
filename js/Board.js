@@ -2,19 +2,19 @@
  * @author: Marc Maycas <marc.maycas@gmail.com>
  */
 
-var Board = (function($) {
+var Board = (function ($) {
 
     'use strict';
 
-    function Board(placeholder) {
+    function Board(placeholder, test, testGrid) {
         this.dimension = 3;
         this.placeholder = placeholder;
         this.cells = [];
 
-        this.buildGrid();
+        this.buildGrid(test, testGrid);
     }
 
-    Board.prototype.buildGrid = function(test, testGrid) {
+    Board.prototype.buildGrid = function (test, testGrid) {
         var i = 0; // Counter to go through the array of list items inside of the grid
         var cell;
         var rowTemp;
@@ -40,7 +40,7 @@ var Board = (function($) {
         }
     };
 
-    Board.prototype.getEmptyCells = function() {
+    Board.prototype.getEmptyCells = function () {
         var emptyCells = [];
 
         for (var row = 0; row < this.cells.length; row++) {
@@ -53,7 +53,7 @@ var Board = (function($) {
         return emptyCells;
     };
 
-    Board.prototype.registerClickCellHandlers = function() {
+    Board.prototype.registerClickCellHandlers = function () {
         var currentCell;
         for (var row = 0; row < this.cells.length; row++) {
             for (var col = 0; col < this.cells[row].length; col++) {
@@ -66,7 +66,7 @@ var Board = (function($) {
 
     // Decided to split cell handlers registering to ensure that when the player changes,
     // only the hover handler is affected, not the click one
-    Board.prototype.registerHoverCellHandlers = function(playerSymbol) {
+    Board.prototype.registerHoverCellHandlers = function (playerSymbol) {
         var currentCell;
         for (var row = 0; row < this.cells.length; row++) {
             for (var col = 0; col < this.cells[row].length; col++) {
@@ -77,7 +77,7 @@ var Board = (function($) {
         }
     };
 
-    Board.prototype.checkWinner = function(lastMove) {
+    Board.prototype.checkWinner = function (lastMove) {
         var cellSymbol = this.cells[lastMove[0]][lastMove[1]].symbol;
         if (this.checkSection(lastMove, cellSymbol, "row") ||
             this.checkSection(lastMove, cellSymbol, "col") ||
@@ -88,7 +88,7 @@ var Board = (function($) {
         return false;
     };
 
-    Board.prototype.checkSection = function(lastMove, cellSymbol, toCheck) {
+    Board.prototype.checkSection = function (lastMove, cellSymbol, toCheck) {
         var row, col;
         for (var i = 0; i < this.dimension; i++) {
             switch (toCheck) {
@@ -109,6 +109,7 @@ var Board = (function($) {
                     col = this.dimension - row - 1;
                     break;
             }
+            // There's no winner if the checked cell is empty or it has a different symbol than the current executed move
             if (this.cells[row][col].isEmpty() || this.cells[row][col].symbol !== cellSymbol) {
                 return false;
             }
@@ -116,7 +117,40 @@ var Board = (function($) {
         return true;
     };
 
-    Board.prototype.logBoardStatus = function() {
+    Board.prototype.exportCellsValues = function () {
+        var cells = [];
+        var rowTemp;
+        for (var row = 0; row < this.dimension; row++) {
+            rowTemp = [];
+            for (var col = 0; col < this.dimension; col++) {
+                rowTemp.push(this.cells[row][col].symbol);
+            }
+            cells.push(rowTemp);
+        }
+
+        return cells;
+    };
+
+    Board.prototype.cloneBoard = function () {
+        return new Board(undefined, true, this.exportCellsValues());
+    };
+
+    // Score the board depending on if the player wins or the computer wins
+    Board.prototype.scoreBoard = function (lastMove) {
+        var winner = this.checkWinner(lastMove);
+        if (winner === "O") {
+            //Player wins
+            return 10;
+        } else if (winner === "X") {
+            // Computer wins
+            return -10;
+        } else {
+            // There's no winner
+            return 0;
+        }
+    };
+
+    Board.prototype.logBoardStatus = function () {
         var message = " --- --- ---";
         message += "\n";
         for (var row = 0; row < this.dimension; row++) {

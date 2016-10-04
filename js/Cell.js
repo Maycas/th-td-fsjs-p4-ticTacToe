@@ -2,7 +2,7 @@
  * @author: Marc Maycas <marc.maycas@gmail.com>
  */
 
-var Cell = (function($) {
+var Cell = (function ($) {
 
     'use strict';
 
@@ -14,7 +14,7 @@ var Cell = (function($) {
         this.setSymbol(symbol);
     }
 
-    Cell.prototype.setSymbol = function(playerSymbol) {
+    Cell.prototype.setSymbol = function (playerSymbol) {
         // Depending on the playerSymbol selected, update the symbol and the box style class
         switch (playerSymbol) {
             case "X":
@@ -31,27 +31,26 @@ var Cell = (function($) {
         }
     };
 
-    Cell.prototype.isEmpty = function() {
-        //return !($(this.placeholder).hasClass("box-filled-1") || $(this.placeholder).hasClass("box-filled-2"));
+    Cell.prototype.isEmpty = function () {
         return this.symbol !== "X" && this.symbol !== "O";
     };
 
-    Cell.prototype.isDisplayed = function() {
+    Cell.prototype.isDisplayed = function () {
         return ($(this.placeholder).hasClass("box-filled-1") || $(this.placeholder).hasClass("box-filled-2"));
     };
 
-    Cell.prototype.displaySymbolInCell = function() {
+    Cell.prototype.displaySymbolInCell = function () {
         // Set the specific class for the selected box
         $(this.placeholder).addClass(this.boxClass);
         // Remove any selected background image due to hovering
         $(this.placeholder).attr('style', '');
     };
 
-    Cell.prototype.clickHandler = function() {
+    Cell.prototype.clickHandler = function () {
         // Get a reference to the current cell that has been clicked
         var cellReference = this;
 
-        $(this.placeholder).click(function() {
+        $(this.placeholder).click(function () {
             // If the cell is empty or not clicked before
             if (!cellReference.isDisplayed()) {
                 // Display the symbol in the cell
@@ -62,7 +61,7 @@ var Cell = (function($) {
         });
     };
 
-    Cell.prototype.hoverHandler = function(playerSymbol) {
+    Cell.prototype.hoverHandler = function (playerSymbol) {
         // Get a reference to the current cell that has been clicked
         var cellReference = this;
         var symbol = playerSymbol;
@@ -73,7 +72,7 @@ var Cell = (function($) {
         // Set the new hover handler event
         $(this.placeholder).hover(
             // When hovering, set the correct symbol in the empty cell
-            function() {
+            function () {
                 // Only act when the cell is empty
                 if (cellReference.isEmpty()) {
                     if (symbol === "X") {
@@ -84,7 +83,7 @@ var Cell = (function($) {
                 }
             },
             // When un-hovering, remove the symbol (reset to initial)
-            function() {
+            function () {
                 if (cellReference.isEmpty()) {
                     $(cellReference.placeholder).css('background-image', 'initial');
                 }

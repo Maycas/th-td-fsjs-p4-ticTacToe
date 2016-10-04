@@ -2,7 +2,7 @@
  * @author: Marc Maycas <marc.maycas@gmail.com>
  */
 
-var GameManager = (function($) {
+var GameManager = (function ($) {
 
     'use strict';
 
@@ -19,28 +19,28 @@ var GameManager = (function($) {
         this.endGameScreen = '<div class="screen screen-win" id="finish"><header><h1>Tic Tac Toe</h1><p class="message"></p><a href="#" class="button">New game</a></header></div>';
     }
 
-    GameManager.prototype.init = function() {
+    GameManager.prototype.init = function () {
         // Load the game screen screen
-        $("body").html(this.startScreen);
+        //$("body").html(this.startScreen);
 
         // When page loads hide everything except the buttons to select the game mode
-        $("#player-1, #player-2, #start-game, #back").hide();
+        $("#player-1, #player-2, #difficulty-selector, #start-game, #back").hide();
 
         // When clicking single player mode, allow user to put his name only because he/she is playing against the computer
-        $("#single-player").on("click", function() {
+        $("#single-player").on("click", function () {
             $("#mode-select").hide();
-            $("#player-1, #start-game, #back").show();
+            $("#player-1, #difficulty-selector, #start-game, #back").show();
         });
 
         // When clicking multiplayer, both players can set their names
-        $("#multiplayer").on("click", function() {
+        $("#multiplayer").on("click", function () {
             $("#mode-select").hide();
             $("#player-1, #player-2, #start-game, #back").show();
         });
 
         // If the user wants to go back, hide everything and show only the game modes and reset the fields values in case they were half filled in
-        $("#back").on("click", function() {
-            $("#player-1, #player-2, #start-game, #back").hide();
+        $("#back").on("click", function () {
+            $("#player-1, #player-2, #difficulty-selector, #start-game, #back").hide();
             $("#mode-select").show();
 
             $("#player-input-1").val("");
@@ -50,7 +50,7 @@ var GameManager = (function($) {
         // Register the event handler for the start game button, which takes to the game screen
         $("#start-game").on("click", {
             gameManager: this
-        }, function(event) {
+        }, function (event) {
             var gameManager = event.data.gameManager;
 
             // Get the info from the players in the init screen
@@ -61,7 +61,7 @@ var GameManager = (function($) {
         });
     };
 
-    GameManager.prototype.setPlayerInfo = function(gameManager) {
+    GameManager.prototype.setPlayerInfo = function (gameManager) {
         // Get name for player 1
         var playerOneName = $("#player-input-1").val();
         if (playerOneName === "") {
@@ -84,12 +84,15 @@ var GameManager = (function($) {
             playerTwoIsComputer = true;
         }
 
+        // Get the difficulty level
+        var level = $("#level-selector").val();
+
         // Create the players for the game
         gameManager.player1 = new Player("O", playerOneName, false);
-        gameManager.player2 = new Player("X", playerTwoName, playerTwoIsComputer, "easy");
+        gameManager.player2 = new Player("X", playerTwoName, playerTwoIsComputer, level);
     };
 
-    GameManager.prototype.loadGameScreen = function() {
+    GameManager.prototype.loadGameScreen = function () {
         // Load the game screen screen
         $("body").html(this.gameScreen);
 
@@ -98,12 +101,13 @@ var GameManager = (function($) {
         $("#player2 span").html(this.player2.playerName);
     };
 
-    GameManager.prototype.gameSetup = function() {
+    GameManager.prototype.gameSetup = function () {
         // Load the game screen
         this.loadGameScreen();
 
-        // Define the first player to start
-        this.currentPlayer = this.player1;
+        // Define the first player to start based on a random algorithm
+        //this.currentPlayer = this.setRandomInitPlayer();
+        this.currentPlayer = this.player2; // TODO: Remove this
         this.setActivePlayer(this.currentPlayer);
 
         // Create the board
@@ -116,9 +120,16 @@ var GameManager = (function($) {
         $(this.board.placeholder).on("cellClick", {
             gameManager: this
         }, this.cellClickHandler);
+
+        // If the current start player is a computer, force to move first and take the center, which
+        // is the most important cell of the game
+        if (this.currentPlayer.isComputer) {
+            this.currentPlayer.makeMove(this);
+        }
+
     };
 
-    GameManager.prototype.cellClickHandler = function(event, clickedCell) {
+    GameManager.prototype.cellClickHandler = function (event, clickedCell) {
         // Get the reference of the Game Manager
         var gameManager = event.data.gameManager;
 
@@ -129,27 +140,34 @@ var GameManager = (function($) {
         var currentPlayer = gameManager.currentPlayer;
 
         // Get the clicked cell position
-        var pos = clickedCell.position;
+        var move = clickedCell.position;
 
         // Set current player's symbol in the cell and show it
-        board.cells[pos[0]][pos[1]].setSymbol(currentPlayer.symbol);
-        board.cells[pos[0]][pos[1]].displaySymbolInCell();
+        board.cells[move[0]][move[1]].setSymbol(currentPlayer.symbol);
+        board.cells[move[0]][move[1]].displaySymbolInCell();
 
         // Check if there's a winner
-        if (board.checkWinner(pos) || board.getEmptyCells().length === 0) {
-            var winner = board.checkWinner(pos);
+        if (board.checkWinner(move) || board.getEmptyCells().length === 0) {
+            var winner = board.checkWinner(move);
             gameManager.loadWinnerScreen(gameManager, winner);
         } else {
             gameManager.togglePlayer(gameManager);
             // If the new player is a computer, calculate the new move and apply it
             if (gameManager.currentPlayer.isComputer) {
-                console.log(gameManager.board);
-                gameManager.currentPlayer.makeMove(gameManager.board);
+                gameManager.currentPlayer.makeMove(gameManager, move);
             }
         }
     };
 
-    GameManager.prototype.setActivePlayer = function(currentPlayer) {
+    GameManager.prototype.setRandomInitPlayer = function () {
+        if (Math.random() < 0.5) {
+            return this.player1;
+        }
+        return this.player2;
+
+    };
+
+    GameManager.prototype.setActivePlayer = function (currentPlayer) {
         $(".active").removeClass("active");
         if (currentPlayer.symbol === "O") {
             $("#player1").addClass("active");
@@ -158,7 +176,7 @@ var GameManager = (function($) {
         }
     };
 
-    GameManager.prototype.togglePlayer = function(gameManager)  {
+    GameManager.prototype.togglePlayer = function (gameManager)  {
         // Set the new active player
         if (gameManager.currentPlayer === gameManager.player2) {
             gameManager.currentPlayer = gameManager.player1;
@@ -173,7 +191,7 @@ var GameManager = (function($) {
         gameManager.board.registerHoverCellHandlers(gameManager.currentPlayer.symbol);
     };
 
-    GameManager.prototype.loadWinnerScreen = function(gameManager, winnerSymbol) {
+    GameManager.prototype.loadWinnerScreen = function (gameManager, winnerSymbol) {
         // Load win screen
         $("body").html(gameManager.endGameScreen);
 
@@ -199,7 +217,7 @@ var GameManager = (function($) {
         $("#finish").addClass(className);
 
         // Set the event listener for the new game button
-        $(".button").click(function() {
+        $(".button").click(function () {
             gameManager.gameSetup();
         });
     };

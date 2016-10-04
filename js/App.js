@@ -2,7 +2,7 @@
  * @author: Marc Maycas <marc.maycas@gmail.com>
  */
 
-! function($) {
+! function ($) {
 
   'use strict';
 

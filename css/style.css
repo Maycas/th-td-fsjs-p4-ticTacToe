@@ -236,7 +236,8 @@ label {
   color: #ffffff;
 }
 
-input {
+input,
+select {
   margin: 10px 0;
   border-radius: 10px;
   padding: 0.6em 0.75em;
@@ -245,9 +246,15 @@ input {
   width: 20%;
 }
 
+select {
+  width: 22%;
+  height: 42px;
+}
+
 input:focus {
   background-color: #ffffff;
 }
+
 
 /*************************
 NAME DISPLAY IN GAME
