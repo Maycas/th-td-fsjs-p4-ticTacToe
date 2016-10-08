@@ -164,7 +164,6 @@ var GameManager = (function ($) {
             return this.player1;
         }
         return this.player2;
-
     };
 
     GameManager.prototype.setActivePlayer = function (currentPlayer) {

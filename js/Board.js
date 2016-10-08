@@ -10,6 +10,7 @@ var Board = (function ($) {
         this.dimension = 3;
         this.placeholder = placeholder;
         this.cells = [];
+        this.solved = false;
 
         this.buildGrid(test, testGrid);
     }
@@ -114,6 +115,7 @@ var Board = (function ($) {
                 return false;
             }
         }
+        this.solved = true;
         return true;
     };
 
@@ -144,9 +146,6 @@ var Board = (function ($) {
         } else if (winner === "X") {
             // Computer wins
             return -10;
-        } else {
-            // There's no winner
-            return 0;
         }
     };
 

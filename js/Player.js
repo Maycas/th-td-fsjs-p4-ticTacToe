@@ -30,7 +30,7 @@ var Player = (function ($) {
         if (lastMove) {
             this.calculateMove(gameManager, lastMove);
         } else {
-            // If the lastMove has not been defined, then it's the first move of the game and the player will get the center
+            // If the lastMove has not been defined, then it's the first move of the game and the player will get the center (which is the most important cell)
             this.nextMove = [1, 1];
         }
 
@@ -55,7 +55,11 @@ var Player = (function ($) {
 
     Player.prototype.setMinimaxMove = function (board, currentPlayerSymbol, lastMove) {
         // If the game is still ongoing
-        if (board.checkWinner(lastMove) !== " " && board.getEmptyCells().length === 0) {
+        console.log(">>>>>>>>> Current Board to check winner");
+        console.log(board.logBoardStatus());
+        console.log(board.checkWinner(lastMove));
+        if (board.checkWinner(lastMove) === "X" || board.checkWinner(lastMove) === "O") {
+            console.log("There's a winner!", board.checkWinner(lastMove), "scoring board as", board.scoreBoard(lastMove));
             return board.scoreBoard(lastMove);
         }
 
@@ -66,29 +70,52 @@ var Player = (function ($) {
         var max_score, min_score;
         var max_score_index, min_score_index;
         var clonedBoard;
+        var minimaxScore;
 
         // Populate the scores array, using recursion
         var availableMoves = board.getEmptyCells();
         for (var i = 0; i < availableMoves.length; i++) {
-            currentMove = availableMoves[i];
-            clonedBoard = board.cloneBoard();
+            if (!board.solved) {
+                currentMove = availableMoves[i];
+                clonedBoard = board.cloneBoard();
 
-            clonedBoard.cells[currentMove[0]][currentMove[1]].setSymbol(currentPlayerSymbol);
+                clonedBoard.cells[currentMove[0]][currentMove[1]].setSymbol(currentPlayerSymbol);
 
-            console.log(clonedBoard.logBoardStatus());
+                console.log(">>>>>>>>> Cloned Board before applying minimax");
+                console.log(clonedBoard.logBoardStatus());
 
-            currentPlayerSymbol = this.toggleSymbol(currentPlayerSymbol);
-            scores.push(this.setMinimaxMove(clonedBoard, currentPlayerSymbol, currentMove));
-            moves.push(currentMove);
+                minimaxScore = this.setMinimaxMove(clonedBoard, this.toggleSymbol(currentPlayerSymbol), currentMove)
+                if (minimaxScore === undefined) {
+                    minimaxScore = 0;
+                }
+
+                scores.push(minimaxScore);
+                moves.push(currentMove);
+
+                console.log(">>>>>>>>> Cloned Board after applying minimax");
+                console.log(clonedBoard.logBoardStatus());
+
+                console.log("scores", scores);
+                console.log("moves", moves);
+            } else {
+                break;
+            }
         }
 
         // Do min and max calculation
+        console.log("Apply the score computation and the move");
+
         // Player
         if (currentPlayerSymbol === "O") {
             // Max calculation - Player
             max_score = Math.max.apply(Math, scores);
             max_score_index = scores.indexOf(max_score);
-            this.nextMove = moves[max_score_index];
+
+            console.log(">>>>>>>>> Player turn");
+
+            console.log("moves", moves);
+            console.log("scores", scores);
+            console.log("player choice", this.nextMove);
 
             return scores[max_score_index];
         } else {
@@ -97,9 +124,11 @@ var Player = (function ($) {
             min_score_index = scores.indexOf(min_score);
             this.nextMove = moves[min_score_index];
 
-            console.log("computer choice", this.nextMove);
+            console.log(">>>>>>>>> Computer turn");
+
             console.log("moves", moves);
             console.log("scores", scores);
+            console.log("player choice", this.nextMove);
 
             return scores[min_score_index];
         }
