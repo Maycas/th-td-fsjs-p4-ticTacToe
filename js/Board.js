@@ -2,7 +2,7 @@
  * @author: Marc Maycas <marc.maycas@gmail.com>
  */
 
-var Board = (function ($) {
+var Module = (function ($, module) {
 
     'use strict';
 
@@ -26,10 +26,10 @@ var Board = (function ($) {
                 for (var col = 0; col < this.dimension; col++) {
                     if (!test) {
                         // Create empty cells to be included in the temporary row
-                        cell = new Cell($(this.placeholder).children()[i], " ", [row, col]);
+                        cell = new module.Cell($(this.placeholder).children()[i], " ", [row, col]);
                     } else {
                         // If the data comes from a test a array, get the proper symbol
-                        cell = new Cell($(this.placeholder).children()[i], testGrid[row][col], [row, col]);
+                        cell = new module.Cell($(this.placeholder).children()[i], testGrid[row][col], [row, col]);
                     }
                     rowTemp.push(cell);
 
@@ -134,7 +134,7 @@ var Board = (function ($) {
     };
 
     Board.prototype.cloneBoard = function () {
-        return new Board(undefined, true, this.exportCellsValues());
+        return new module.Board(undefined, true, this.exportCellsValues());
     };
 
     // Score the board depending on if the player wins or the computer wins
@@ -166,6 +166,8 @@ var Board = (function ($) {
         return message;
     };
 
-    return Board;
+    module.Board = Board;
 
-})(jQuery);
+    return module;
+
+})(jQuery, Module || {});

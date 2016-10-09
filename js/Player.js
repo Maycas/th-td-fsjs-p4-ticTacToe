@@ -2,7 +2,7 @@
  * @author: Marc Maycas <marc.maycas@gmail.com>
  */
 
-var Player = (function ($) {
+var Module = (function ($, module) {
 
     'use strict';
 
@@ -55,11 +55,7 @@ var Player = (function ($) {
 
     Player.prototype.setMinimaxMove = function (board, currentPlayerSymbol, lastMove) {
         // If the game is still ongoing
-        console.log(">>>>>>>>> Current Board to check winner");
-        console.log(board.logBoardStatus());
-        console.log(board.checkWinner(lastMove));
         if (board.checkWinner(lastMove) === "X" || board.checkWinner(lastMove) === "O") {
-            console.log("There's a winner!", board.checkWinner(lastMove), "scoring board as", board.scoreBoard(lastMove));
             return board.scoreBoard(lastMove);
         }
 
@@ -81,9 +77,6 @@ var Player = (function ($) {
 
                 clonedBoard.cells[currentMove[0]][currentMove[1]].setSymbol(currentPlayerSymbol);
 
-                console.log(">>>>>>>>> Cloned Board before applying minimax");
-                console.log(clonedBoard.logBoardStatus());
-
                 minimaxScore = this.setMinimaxMove(clonedBoard, this.toggleSymbol(currentPlayerSymbol), currentMove)
                 if (minimaxScore === undefined) {
                     minimaxScore = 0;
@@ -91,31 +84,17 @@ var Player = (function ($) {
 
                 scores.push(minimaxScore);
                 moves.push(currentMove);
-
-                console.log(">>>>>>>>> Cloned Board after applying minimax");
-                console.log(clonedBoard.logBoardStatus());
-
-                console.log("scores", scores);
-                console.log("moves", moves);
             } else {
                 break;
             }
         }
 
         // Do min and max calculation
-        console.log("Apply the score computation and the move");
-
         // Player
         if (currentPlayerSymbol === "O") {
             // Max calculation - Player
             max_score = Math.max.apply(Math, scores);
             max_score_index = scores.indexOf(max_score);
-
-            console.log(">>>>>>>>> Player turn");
-
-            console.log("moves", moves);
-            console.log("scores", scores);
-            console.log("player choice", this.nextMove);
 
             return scores[max_score_index];
         } else {
@@ -124,17 +103,13 @@ var Player = (function ($) {
             min_score_index = scores.indexOf(min_score);
             this.nextMove = moves[min_score_index];
 
-            console.log(">>>>>>>>> Computer turn");
-
-            console.log("moves", moves);
-            console.log("scores", scores);
-            console.log("player choice", this.nextMove);
-
             return scores[min_score_index];
         }
 
     };
 
-    return Player;
+    module.Player = Player;
 
-})(jQuery);
+    return module;
+
+})(jQuery, Module || {});

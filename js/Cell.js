@@ -2,7 +2,7 @@
  * @author: Marc Maycas <marc.maycas@gmail.com>
  */
 
-var Cell = (function ($) {
+var Module = (function ($, module) {
 
     'use strict';
 
@@ -90,6 +90,8 @@ var Cell = (function ($) {
             });
     };
 
-    return Cell;
+    module.Cell = Cell;
 
-})(jQuery);
+    return module;
+
+})(jQuery, Module || {});

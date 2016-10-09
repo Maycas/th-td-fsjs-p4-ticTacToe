@@ -2,12 +2,12 @@
  * @author: Marc Maycas <marc.maycas@gmail.com>
  */
 
-! function ($) {
+! function ($, module) {
 
   'use strict';
 
-  var gm = new GameManager();
+  var gm = new module.GameManager();
   gm.init();
 
 
-}(jQuery);
+}(jQuery, Module);
