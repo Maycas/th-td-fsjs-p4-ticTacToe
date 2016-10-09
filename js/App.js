@@ -1,12 +1,15 @@
 /**
+ * Main autoexecutable function for Tic-Tac-Toe
+ * Declares the Game Manager from the main module and starts it
  * @author: Marc Maycas <marc.maycas@gmail.com>
  */
 
-! function ($, module) {
+! function ($, Module) {
 
   'use strict';
 
-  var gm = new module.GameManager();
+  // Instantiate the game manager and initialize it
+  var gm = new Module.GameManager();
   gm.init();
 
 

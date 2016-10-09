@@ -1,11 +1,30 @@
 /**
+ * GameManager object
+ * @namespace Module
  * @author: Marc Maycas <marc.maycas@gmail.com>
+ *
+ * @param {object} $        - jQuery library
+ * @param {object} module   - Main global variable module
+ * 
+ * @property {object} player1       - Player 1 object
+ * @property {object} player2       - Player 2 object
+ * @property {object} currentPlayer - Current player that has to perform the next move
+ * @property {object} board         - Board that's being played
+ * @property {string} startScreen   - HTML template of the start screen
+ * @property {string} gameScreen    - HTML template of the game screen
+ * @property {string} endGameScreen - HTML template of the end game screen
+ *  
+ * @returns {object} module.GameManager
  */
 
 var Module = (function ($, module) {
 
     'use strict';
 
+    /**
+     * Game Manager constructor
+     * @constructor
+     */
     function GameManager() {
         this.player1 = undefined;
         this.player2 = undefined;
@@ -19,6 +38,9 @@ var Module = (function ($, module) {
         this.endGameScreen = '<div class="screen screen-win" id="finish"><header><h1>Tic Tac Toe</h1><p class="message"></p><a href="#" class="button">New game</a></header></div>';
     }
 
+    /**
+     * Initializes the game by setting the start screen template and logic
+     */
     GameManager.prototype.init = function () {
         // Load the game screen screen
         $("body").html(this.startScreen);
@@ -61,6 +83,11 @@ var Module = (function ($, module) {
         });
     };
 
+    /**
+     * Sets the player information depending on the data introduced by the user in the start screen
+     * 
+     * @param {object} gameManager  - Reference to the existing game manager
+     */
     GameManager.prototype.setPlayerInfo = function (gameManager) {
         // Get name for player 1
         var playerOneName = $("#player-input-1").val();
@@ -92,8 +119,11 @@ var Module = (function ($, module) {
         gameManager.player2 = new module.Player("X", playerTwoName, playerTwoIsComputer, level);
     };
 
+    /**
+     * Loads the game screen and sets the names of the players
+     */
     GameManager.prototype.loadGameScreen = function () {
-        // Load the game screen screen
+        // Load the game screen
         $("body").html(this.gameScreen);
 
         // Set the player names inside the placeholders
@@ -101,6 +131,9 @@ var Module = (function ($, module) {
         $("#player2 span").html(this.player2.playerName);
     };
 
+    /**
+     * Setups the game and creates the necessary objects and event listeners to start playing
+     */
     GameManager.prototype.gameSetup = function () {
         // Load the game screen
         this.loadGameScreen();
@@ -128,6 +161,14 @@ var Module = (function ($, module) {
 
     };
 
+    /**
+     * Handler to be executed when a cell is clickedCell
+     * It sets and displays the specific symbol in the clicked cell, checks if there's a winner and in case there's a winner
+     * loads the winner screen or switches the player so the game can continue
+     * 
+     * @param {object} event        - Event object 
+     * @param {object} clickedCell  - Cell that has been clicked
+     */
     GameManager.prototype.cellClickHandler = function (event, clickedCell) {
         // Get the reference of the Game Manager
         var gameManager = event.data.gameManager;
@@ -147,9 +188,11 @@ var Module = (function ($, module) {
 
         // Check if there's a winner
         if (board.checkWinner(move) || board.getEmptyCells().length === 0) {
+            // Load the winner screen in case there's a winner
             var winner = board.checkWinner(move);
             gameManager.loadWinnerScreen(gameManager, winner);
         } else {
+            // If there's no winner toggle the player
             gameManager.togglePlayer(gameManager);
             // If the new player is a computer, calculate the new move and apply it
             if (gameManager.currentPlayer.isComputer) {
@@ -158,6 +201,11 @@ var Module = (function ($, module) {
         }
     };
 
+    /**
+     * Returns a player randomly
+     * 
+     * @returns {object}    - The selected player based on a random selection
+     */
     GameManager.prototype.setRandomInitPlayer = function () {
         if (Math.random() < 0.5) {
             return this.player1;
@@ -165,6 +213,11 @@ var Module = (function ($, module) {
         return this.player2;
     };
 
+    /**
+     * Shows what's the current player's turn
+     * 
+     * @param {object} currentPlayer    - The player that holds the game turn 
+     */
     GameManager.prototype.setActivePlayer = function (currentPlayer) {
         $(".active").removeClass("active");
         if (currentPlayer.symbol === "O") {
@@ -174,6 +227,11 @@ var Module = (function ($, module) {
         }
     };
 
+    /**
+     * Switches the player turn and shows that info in the screen 
+     * 
+     * @param {object} gameManager  - Instance of the game manager that's controlling the game
+     */
     GameManager.prototype.togglePlayer = function (gameManager)  {
         // Set the new active player
         if (gameManager.currentPlayer === gameManager.player2) {
@@ -189,6 +247,12 @@ var Module = (function ($, module) {
         gameManager.board.registerHoverCellHandlers(gameManager.currentPlayer.symbol);
     };
 
+    /**
+     * Loads the winner screen (HTML and event listeners) and sets the specific messages
+     * 
+     * @param {object} gameManager  - Instance of the game manager that's controlling the game
+     * @param {string} winnerSymbol - String representing the winner. It can be "X", "O" or " " (tie)
+     */
     GameManager.prototype.loadWinnerScreen = function (gameManager, winnerSymbol) {
         // Load win screen
         $("body").html(gameManager.endGameScreen);
